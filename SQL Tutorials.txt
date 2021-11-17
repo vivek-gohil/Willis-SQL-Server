@@ -1,0 +1,829 @@
+CREATE DATABASE BikeStores;
+
+--Section 1 Querying data
+
+SELECT
+	first_name,
+	last_name,
+	email
+FROM
+	sales.customers;
+
+
+
+SELECT
+	*
+FROM
+	sales.customers;
+
+SELECT
+	*
+FROM
+	sales.customers
+WHERE
+	state = 'CA';
+
+
+SELECT
+	first_name,last_name,email,state
+FROM
+	sales.customers
+WHERE
+	[state] = 'CA'
+ORDER BY
+	first_name DESC;
+
+SELECT
+	city,
+	first_name,
+	last_name
+FROM
+	sales.customers
+ORDER BY
+	city,
+	first_name;
+
+SELECT
+	first_name,
+	last_name
+FROM
+	sales.customers
+
+SELECT 
+	first_name,
+	LEN(first_name) 'first name length'
+FROM
+	sales.customers;
+
+--Retrieve a customer list sorted by the length of the first name
+
+
+--Section 3. Limiting rows
+--OFFSET FETCH
+SELECT
+	*
+FROM
+	production.products;
+
+--To skip first 10 products and return the rest
+SELECT
+	*
+FROM
+	production.products;
+
+SELECT
+	*
+FROM
+	production.products
+ORDER BY
+	product_id
+OFFSET 10 ROWS;
+
+SELECT
+	*
+FROM
+	production.products
+ORDER BY 
+	list_price DESC
+OFFSET 0 ROWS
+FETCH NEXT 10 ROWS ONLY;
+
+SELECT TOP 10 
+	product_name,
+	list_price
+FROM
+	production.products
+ORDER BY
+	list_price DESC;
+
+--Section 4. Filtering data
+--DISTINCT
+SELECT 
+	 city
+FROM
+	sales.customers
+ORDER BY
+	city;
+
+SELECT DISTINCT
+	 city
+FROM
+	sales.customers
+ORDER BY
+	city;
+
+
+SELECT 
+	 city,
+	 state
+FROM
+	sales.customers
+ORDER BY
+	city,
+	state;
+
+SELECT DISTINCT
+	 city,
+	 state
+FROM
+	sales.customers
+ORDER BY
+	city,
+	state;
+
+SELECT DISTINCT
+	phone
+FROM
+	sales.customers;
+
+	
+
+--WHERE
+SELECT 
+	*
+FROM
+	production.products
+WHERE
+	category_id = 1 AND	model_year = 2018;
+
+SELECT 
+	*
+FROM
+	production.products
+WHERE
+	list_price > 300 OR model_year = 2018;
+
+SELECT 
+	*
+FROM
+	production.products
+WHERE
+	list_price NOT BETWEEN 1899.00 AND 1999.99
+ORDER BY
+	list_price;
+
+--IN
+SELECT 
+	*
+FROM
+	production.products
+WHERE 
+	list_price IN (299.99,369.99,489.99);
+	--list_price = 299.99 OR list_price = 369.99 OR list_price = 489.99
+
+SELECT 
+	*
+FROM
+	production.products
+WHERE 
+	list_price NOT IN (299.99,369.99,489.99);
+
+
+--LIKE
+SELECT 
+	*
+FROM
+	sales.customers;
+
+
+SELECT 
+	*
+FROM
+	sales.customers
+WHERE
+	last_name LIKE 'z%';
+
+
+SELECT 
+	*
+FROM
+	sales.customers
+WHERE
+	last_name LIKE '%er';
+
+SELECT 
+	*
+FROM
+	sales.customers
+WHERE
+	last_name LIKE 't%s';
+
+-- _ 
+SELECT 
+	*
+FROM
+	sales.customers
+WHERE
+	last_name LIKE '_u%';
+
+--[]
+SELECT 
+	*
+FROM
+	sales.customers
+WHERE
+	last_name LIKE '[^a-c]%'
+ORDER BY
+	last_name;
+
+CREATE TABLE sales.feedback (
+	feedback_id INT IDENTITY(1,1) PRIMARY KEY,
+	comment VARCHAR(255) NOT NULL
+)
+
+INSERT INTO sales.feedback(comment)
+VALUES('Can you give me 30% discount'),
+('May I get me 30USD off?'),
+('Is this having 20% discount today?');
+
+SELECT
+	*
+FROM
+	sales.feedback
+WHERE
+	comment LIKE '%30$%%' ESCAPE '$';
+
+SELECT 
+	first_name +' ' + last_name AS full_name
+FROM
+	sales.customers
+ORDER BY
+	full_name;
+
+--SECTION 5.
+--Joins
+GO
+CREATE SCHEMA hr;
+GO
+
+CREATE TABLE hr.candidates (
+	id INT PRIMARY KEY IDENTITY,
+	fullname VARCHAR(100) NOT NULL
+)
+
+CREATE TABLE hr.employees (
+	id INT PRIMARY KEY IDENTITY,
+	fullname VARCHAR(100) NOT NULL
+)
+
+
+INSERT INTO hr.candidates(fullname)
+VALUES
+('John Doe'),
+('Lily Bush'),
+('Peter Drucker'),
+('Jane Doe');
+
+SELECT * FROM hr.candidates;
+
+
+INSERT INTO hr.employees(fullname)
+VALUES
+	('John Doe'),
+	('Jane Doe'),
+	('Michael Scott'),
+	('Jack Sparrow')
+
+SELECT * FROM hr.candidates;
+SELECT * FROM hr.employees;
+
+--CROSS JOIN
+SELECT
+	*
+FROM
+	hr.candidates , hr.employees;
+
+
+--Inner Join
+SELECT
+	c.fullname 'candidate name',
+	e.fullname 'employee name'
+FROM
+	hr.candidates c
+INNER JOIN
+	hr.employees e
+ON
+	c.fullname = e.fullname;
+
+--Left Join
+SELECT
+	*
+FROM
+	hr.candidates
+LEFT JOIN
+	hr.employees
+ON
+	hr.candidates.fullname = hr.employees.fullname;
+
+--Right Join
+SELECT
+	*
+FROM
+	hr.candidates
+RIGHT JOIN
+	hr.employees
+ON
+	hr.candidates.fullname = hr.employees.fullname;
+
+--Full Join
+SELECT
+	*
+FROM
+	hr.candidates
+FULL JOIN
+	hr.employees
+ON
+	hr.candidates.fullname = hr.employees.fullname;
+
+--Self Join
+SELECT
+	e.first_name , e.manager_id 'Manager Id'   , m.first_name , m.staff_id 'Staff Id' 
+FROM
+	sales.staffs e , sales.staffs m;
+
+--Inner join 
+SELECT 
+	*
+FROM
+	sales.staffs;
+
+SELECT
+	e.first_name 'Employee',
+	m.first_name 'Manager'
+FROM
+	sales.staffs e
+INNER JOIN
+	sales.staffs m
+ON
+	m.staff_id = e.manager_id;
+
+--Aggrigate Functions
+SELECT 
+	MIN(list_price)
+FROM
+	production.products;
+
+SELECT 
+	MAX(list_price)
+FROM
+	production.products;
+
+SELECT 
+	COUNT(list_price)
+FROM
+	production.products;
+
+SELECT 
+	SUM(list_price)
+FROM
+	production.products;
+
+SELECT 
+	AVG(list_price)
+FROM
+	production.products;
+
+SELECT GETDATE();
+SELECT YEAR(GETDATE());
+SELECT MONTH(GETDATE());
+SELECT DAY(GETDATE());
+
+SELECT 
+	order_date,
+	YEAR(order_date) 'Order Year',
+	MONTH(order_date) 'Order Month',
+	DAY(order_date) 'Order Day'
+FROM
+	sales.orders;
+
+--Section 6. Grouping Data
+SELECT
+	customer_id,
+	YEAR(order_date) 'Order Year',
+	COUNT(order_id) 'Orders Placed'
+FROM
+	sales.orders
+GROUP BY
+	customer_id,
+	YEAR(order_date)
+ORDER BY
+	customer_id;
+
+SELECT
+	customer_id,
+	state
+FROM
+	sales.customers
+ORDER BY 
+	state;
+
+--Count of products in each category
+SELECT 
+	category_id,count(product_name) 'Products Count'
+FROM
+	production.products
+GROUP BY
+	category_id
+HAVING
+	COUNT(product_name) > 50
+ORDER BY category_id;
+
+
+--SubQuery
+SELECT
+	*
+FROM
+	sales.customers
+WHERE
+	city = 'New York';
+
+
+SELECT
+	*
+FROM
+	sales.orders;
+
+--Find the sales orders of the customers who locate in New York
+
+SELECT
+	*
+FROM
+	sales.orders
+WHERE 
+	customer_id IN (
+		SELECT
+			customer_id
+		FROM
+			sales.customers
+		WHERE
+			city = 'New York')
+ORDER BY
+	customer_id;
+
+SELECT
+	*
+FROM
+	production.products
+WHERE
+	category_id = (
+		SELECT
+			category_id
+		FROM
+			production.categories
+		WHERE
+			category_id = 5 );
+
+-- Print the product details who has the max list price.
+
+SELECT
+	*
+FROM
+	production.products
+WHERE
+	list_price = (
+		SELECT
+			MAX(list_price)
+		FROM
+			production.products);
+		
+--ANY
+--Find the products whose list prices are greater than or equal to the average list price of
+--any product brand
+SELECT
+	*
+FROM
+	production.products
+WHERE
+	list_price >= ANY ( 
+	SELECT
+		AVG(list_price)
+	FROM
+		production.products
+	GROUP BY
+		brand_id
+	);
+
+
+SELECT
+	brand_id,
+	COUNT(product_id) 'Product count',
+	AVG(list_price) 'Avg list price'
+FROM
+	production.products
+GROUP BY
+	brand_id
+ORDER BY
+	brand_id;
+
+
+--ALL
+--Find the products whose list prices are greater than or equal to the average list price of
+--all product brand
+
+SELECT
+	*
+FROM
+	production.products
+WHERE
+	list_price >= ALL ( 
+	SELECT
+		AVG(list_price)
+	FROM
+		production.products
+	GROUP BY
+		brand_id
+	);
+
+--EXISTS OR NOT EXISTS
+SELECT
+	*
+FROM
+	sales.customers;
+
+SELECT
+	*
+FROM
+	sales.orders;
+
+--Find the customers who bought products (Find the customers who have placed a order)
+SELECT
+	*
+FROM
+	sales.customers c
+WHERE
+	EXISTS (
+		SELECT 
+			customer_id
+		FROM
+			sales.orders o
+		WHERE
+			o.customer_id = c.customer_id
+	)
+
+--Find the customers who bought products in year 2017 (Find the customers who have placed a order)
+SELECT
+	*
+FROM
+	sales.customers c
+WHERE
+	EXISTS (
+		SELECT 
+			customer_id
+		FROM
+			sales.orders o
+		WHERE
+			o.customer_id = c.customer_id
+			AND
+			YEAR(o.order_date) = 2016  
+			AND
+			YEAR(o.order_date) = 2017  
+			) 
+			)
+
+--Create database
+CREATE DATABASE TestDB;
+
+--Drop database
+DROP DATABASE TestDB;
+
+DROP DATABASE IF EXISTS TestDB;
+
+--CREATE TABLE
+CREATE TABLE sales.visits (
+	visit_id INT PRIMARY KEY IDENTITY(1,1),
+	first_name VARCHAR(20) NOT NULL,
+	last_name VARCHAR(20) NOT NULL,
+	phone VARCHAR(12)
+);
+
+INSERT INTO sales.visits VALUES('Vivek' ,'Gohil','9920728158');
+
+INSERT INTO sales.visits(first_name,last_name) VALUES('Sameer' , 'Harmalkar');
+INSERT INTO sales.visits(last_name,phone,first_name) VALUES('Acharekar','992072815' , 'Trupti');
+
+SELECT * FROM sales.visits;
+
+--update
+UPDATE sales.visits SET phone = '9920728158' WHERE visit_id = 1;
+
+--delete
+DELETE sales.visits WHERE visit_id = 3;
+DELETE sales.visits WHERE visit_id IN (4,1);
+
+DELETE sales.visits;
+
+TRUNCATE TABLE sales.visits;
+
+-- INSERT , UPDATE , DELETE :: DML - DATA MANIPULATION LANGUAGE
+-- CREATE , ALTER , DROP :: DDL - DATA DEFINATION LANGUAGE
+
+--ALTER TABLE 
+--ALTER TABLE ADD COLUMN
+ALTER TABLE sales.visits 
+ADD email VARCHAR(100);
+
+--ALTER TABLE DROP COLUMN
+ALTER TABLE sales.visits
+DROP COLUMN email;
+
+SELECT 
+	*
+FROM
+	sales.visits;
+
+--DROP TABLE
+DROP TABLE sales.visits;
+
+
+--Constraints
+--1. Primary Key Constraint
+--2. Foreign Key Constraint
+--3. Check Constraint
+--4. Not Null Constraint
+--5. Default Constraint
+
+
+--Foreign key
+--Step 1 :: Create tables
+CREATE TABLE sales.vendor_groups(
+	group_id INT PRIMARY KEY IDENTITY,
+	group_name VARCHAR(20)
+);
+
+CREATE TABLE sales.vendors (
+	vendor_id INT PRIMARY KEY IDENTITY,
+	vendor_name VARCHAR(20),
+	group_id INT NOT NULL,
+	CONSTRAINT fk_group FOREIGN KEY(group_id) REFERENCES sales.vendor_groups(group_id)
+)
+
+--Step 2 :: Insert Records
+--Insert some rows into vendor_groups table
+INSERT INTO sales.vendor_groups(group_name)
+VALUES 
+	('Third-Party Vendors'),
+	('Interco Vendors'),
+	('One-Time Vendors');
+
+SELECT * FROM sales.vendor_groups;
+
+--Insert some rows into vendors table
+INSERT INTO sales.vendors(vendor_name,group_id)
+VALUES('ABC Corp',1);
+
+INSERT INTO sales.vendors(vendor_name,group_id)
+VALUES('XYZ Corp',2);
+
+INSERT INTO sales.vendors(vendor_name,group_id)
+VALUES('PQR Corp',3);
+
+SELECT * FROM sales.vendors;
+
+INSERT INTO sales.vendors(vendor_name,group_id)
+VALUES('MNO Corp',1);
+
+INSERT INTO sales.vendors(vendor_name,group_id)
+VALUES('JKL Corp',4);
+
+--Check constraint
+
+GO
+CREATE SCHEMA TEST;
+GO
+
+
+CREATE TABLE test.products (
+	product_id INT PRIMARY KEY IDENTITY,
+	prodcut_name VARCHAR(20) NOT NULL,
+	unit_price INT CHECK(unit_price > 0)
+)
+
+INSERT INTO TEST.products(prodcut_name,unit_price) 
+VALUES('Lux' , 1);
+
+SELECT * FROM TEST.products;
+
+
+--DEFAULT 
+
+DROP TABLE sales.visits;
+
+CREATE TABLE sales.visits (
+	visit_id INT PRIMARY KEY IDENTITY(1,1),
+	first_name VARCHAR(20) NOT NULL,
+	last_name VARCHAR(20) NOT NULL,
+	phone VARCHAR(12),
+);
+
+SELECT * FROM sales.visits;
+
+ALTER TABLE sales.visits
+ADD city VARCHAR(20) DEFAULT 'Mumbai';
+
+
+INSERT INTO sales.visits
+VALUES('Vivek','Gohil','9920728158',NULL);
+
+INSERT INTO sales.visits(first_name,last_name,phone)
+VALUES('Vivek','Gohil','9920728158');
+
+
+--SQL Server Date Functions
+SELECT GETDATE() date_time;
+SELECT DAY(GETDATE()) [day];
+SELECT MONTH(GETDATE()) [month];
+SELECT YEAR(GETDATE()) [year];
+
+SELECT DAY('2030-12-01') [day];
+SELECT MONTH('2030-12-01') [month];
+SELECT YEAR('2030-12-01') [year];
+
+--DATENAME
+SELECT DATENAME(YEAR,GETDATE()) AS 'YEAR';
+SELECT DATENAME(QUARTER,GETDATE()) AS 'quarter';
+SELECT DATENAME(MONTH,GETDATE()) AS 'month';
+SELECT DATENAME(WEEKDAY,GETDATE()) AS 'weekday';
+
+--DATEADD
+SELECT DATEADD(DAY,1,GETDATE()) AS 'DatePlusOneDay';
+SELECT DATEADD(MONTH,1,GETDATE()) AS 'DatePlusOneMonth';
+SELECT DATEADD(YEAR,1,GETDATE()) AS 'DatePlusOneYear';
+
+--DATEDIFF
+SELECT DATEDIFF(DAY,GETDATE(),'2021-11-20') 'diffindays';
+SELECT DATEDIFF(MONTH,GETDATE(),'2021-12-18') 'diffinmonths';
+SELECT DATEDIFF(YEAR,GETDATE(),'2022-12-18') 'diffinyears';
+
+--Views
+SELECT
+	*
+FROM
+	sales.customers;
+
+GO
+CREATE VIEW sales.vi_customers
+AS
+SELECT
+	customer_id,
+	first_name,
+	last_name,
+	street,
+	city,
+	state,
+	zip_code
+FROM
+	sales.customers;
+GO
+
+SELECT * FROM sales.vi_customers;
+
+SELECT * FROM sales.vi_customers 
+WHERE city = 'New York';
+
+SELECT * FROM sales.vi_customers
+ORDER BY state;
+
+--update using views
+UPDATE sales.vi_customers
+SET first_name = 'Jack' 
+WHERE customer_id = 5;
+
+--REMOVE OR DROP VIEW
+DROP VIEW IF EXISTS sales.vi_customers;
+
+--Rename view
+EXEC sp_rename @objname = 'sales.vi_customers' , @newname = 'customer_view';
+
+SELECT 
+	*
+FROM
+	sales.customer_view;
+
+EXEC sp_helptext 'sales.customer_view';
+
+CREATE VIEW sales.vi_customers
+AS
+SELECT
+	customer_id,
+	first_name,
+	last_name,
+	street,
+	city,
+	state,
+	zip_code
+FROM
+	sales.customers;
+
+SELECT 
+	*
+FROM
+	sales.customers
+ORDER BY 
+	state;
+
+go
+SELECT
+	*
+FROM
+	dbo.new_customer_view;
+go
